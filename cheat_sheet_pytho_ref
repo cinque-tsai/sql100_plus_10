@@ -1,0 +1,19 @@
+#ongoing
+#comment in python
+-- comment in SQL
+
+SELECT * --get every field
+df  #get every column
+
+FROM table_name --choose table
+#Since python oop, every dataframe(table) is an object and has a name.
+
+WHERE field_a > 5 -- filtering
+df[df[col_a] > 5] #filtering in pandas is cumbersome
+
+
+
+limit 15 --get first fifteen rows
+df.head(15) #get first fifteen rows 
+df.iloc[:15,] #get first fifteen rows, same as above
+
