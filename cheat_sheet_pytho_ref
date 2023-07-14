@@ -11,7 +11,8 @@ FROM table_name --choose table
 WHERE field_a > 5 -- filtering
 df[df[col_a] > 5] #filtering in pandas is cumbersome
 
-
+ORDER BY field_a ASCE, field_b DESC
+df.sort_values([a,b],ascending=[True,False])
 
 limit 15 --get first fifteen rows
 df.head(15) #get first fifteen rows 
