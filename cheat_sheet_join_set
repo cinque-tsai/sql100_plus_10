@@ -1,0 +1,102 @@
+--This is a cheat sheet focus on all kinds of join statement
+-- These are answers modified and annotated to DataCamp exercises.
+
+--Inner Join: keep joined row
+--Ex: Get population size of 2010 and 2015 from population tables of respective years.
+SELECT 
+	p1.country_code, 
+  p1.size AS size2010, 
+  p2.size AS size2015
+FROM populations AS p1
+INNER JOIN populations AS p2
+--Imply the key for Join
+ON p1.country_code = p2.country_code
+WHERE p1.year = 2010
+-- Filter such that p1.year is always five years before p2.year
+    AND p1.year + 5  = p2.year;
+
+
+--Left Join: Keep everything in Left table(one selected by From), and joined row from right
+-- Find top nine countries with the most cities
+SELECT countries.name as country, COUNT(cities.name) as cities_num
+FROM countries
+--Right Table, there is also a Right Join, but it has no great difference from Left Join
+LEFT JOIN cities
+ON countries.code = cities.country_code
+GROUP BY code
+-- Order by count of cities as cities_num
+ORDER BY cities_num DESC, country
+LIMIT 9;
+
+
+-- Union will stack tables together. It's used when you are dealing with two different tables with same format.
+-- Select all fields from economies2015
+SELECT *
+FROM economies2015    
+-- Set operation
+UNION -- Union will get rid of duplicates, use UNION ALL if you want to keep them.
+-- Select all fields from economies2019
+SELECT *
+FROM economies2019
+ORDER BY code, year;
+
+
+-- Filtering With Subtable
+--Subtable: using 
+SELECT code, name
+--Better let From section only to import tables
+FROM countries
+--Filter subtable in Where claus
+WHERE continent = 'Oceania'
+-- Filter for countries not included in the bracketed subquery
+  AND code NOT in  
+    (SELECT code
+    FROM currencies);
+
+SELECT countries.name AS country,
+-- Subquery that provides the count of cities   
+-- Subquerry has to be aggregated
+  (SELECT COUNT(name)
+   FROM cities
+   WHERE country_code = countries.code) AS cities_num
+FROM countries
+ORDER BY cities_num DESC, country
+LIMIT 9;
+
+-- Select local_name and lang_num from appropriate tables
+SELECT countries.local_name,
+FROM countries,
+  (SELECT code, COUNT(*) AS lang_num
+  FROM languages
+  GROUP BY code) AS sub
+-- Where codes match
+-- Where clause is executed after From and Join sections, thus their alias can be used.
+WHERE countries.code = sub.code
+ORDER BY lang_num DESC;
+
+-- Select relevant fields
+SELECT code,inflation_rate,unemployment_rate
+FROM economies
+WHERE year = 2015 
+--Use selection of subtable for filtering
+  AND code NOT IN
+-- Subquery returning country codes filtered on gov_form
+	(SELECT code 
+  FROM countries
+  WHERE gov_form LIKE '%Republic%')
+ORDER BY inflation_rate;
+
+-- Select fields from cities
+SELECT name, country_code, city_proper_pop / metroarea_pop * 100 AS city_perc
+FROM cities
+-- Use subquery to filter city name
+WHERE name in 
+    (SELECT capital
+    FROM countries
+    WHERE continent LIKE '%Europe')
+-- Add filter condition such that metroarea_pop does not have null values
+    AND metroarea_pop IS NOT NULL
+-- Sort and limit the result
+ORDER BY city_perc DESC
+LIMIT 10;
+
